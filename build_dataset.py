@@ -148,7 +148,7 @@ def build_data():
                     'sample_number': s_num,
                     'original_sample_number': int(float(r.get('original_sample_number') or s_num)),
                     'source': 'llm',
-                    'coder': 'LLM (Gemini 3.7 Flash)',
+                    'coder': 'LLM',
                     'participant_id': p_id,
                     'pre_score': float(r['pre_score']),
                     'post_score': float(r['post_score']),
@@ -190,6 +190,22 @@ def build_data():
             'definition': defn
         })
 
+    # Custom Subcode Ordering: BELIEF-STATE
+    # Requested order: certain, incertain (uncertain), high and low investment, high and low strength, maintaining, repeat, becoming and turning point
+    BELIEF_STATE_SUB_ORDER = [
+        'BELIEF-STATE-Certain',
+        'BELIEF-STATE-Uncertain',
+        'BELIEF-STATE-High-Investment',
+        'BELIEF-STATE-Low-Investment',
+        'BELIEF-STATE-High-Strength',
+        'BELIEF-STATE-Low-Strength',
+        'BELIEF-STATE-Maintaining-Certainty',
+        'BELIEF-STATE-Repetition-or-Resistance',
+        'BELIEF-STATE-Becoming-Uncertain',
+        'BELIEF-STATE-Turning-Point'
+    ]
+    bs_order_index = {code: i for i, code in enumerate(BELIEF_STATE_SUB_ORDER)}
+
     FAMILY_ORDER = [
         'BELIEF-STATE',
         'THEME',
@@ -203,7 +219,10 @@ def build_data():
     families = []
     for fam in FAMILY_ORDER:
         if fam in family_map:
-            subs = sorted(family_map[fam], key=lambda x: x['code'])
+            if fam == 'BELIEF-STATE':
+                subs = sorted(family_map[fam], key=lambda x: bs_order_index.get(x['code'], 999))
+            else:
+                subs = sorted(family_map[fam], key=lambda x: x['code'])
             families.append({
                 'family': fam,
                 'subs': subs
@@ -221,7 +240,7 @@ def build_data():
         'n_human_conversations': len(human_convs),
         'n_llm_conversations': len(llm_convs),
         'sources': ['human', 'llm'],
-        'coders': ['Coder_A', 'Coder_B', 'Coder_C', 'LLM (Gemini 3.7 Flash)']
+        'coders': ['Coder_A', 'Coder_B', 'Coder_C', 'LLM']
     }
 
     return {

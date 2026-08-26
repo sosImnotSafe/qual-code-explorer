@@ -44,7 +44,12 @@ function famLabel(fam){
     'LACK': 'Engagement',
     'Mismatch': 'Mismatch'
   };
-  return labels[fam] || fam;
+  return labels[fam] || (fam ? fam.replace(/-/g, ' ') : fam);
+}
+
+function subLabel(sub){
+  if(!sub) return '';
+  return sub.replace(/-/g, ' ');
 }
 
 // ---------------- State ----------------
@@ -673,9 +678,9 @@ function renderFilters(){
     }}, 'reset')
   ]);
   numSection.appendChild(numTitle);
-  renderDualSlider(numSection, 'pre_score', state.ranges.pre_score, 'Pre-score (Initial belief)', renderAll);
-  renderDualSlider(numSection, 'post_score', state.ranges.post_score, 'Post-score (Final belief)', renderAll);
-  renderDualSlider(numSection, 'change_score', state.ranges.change_score, 'Change score (Pre − Post)', renderAll);
+  renderDualSlider(numSection, 'pre_score', state.ranges.pre_score, 'Pre Score (Initial belief)', renderAll);
+  renderDualSlider(numSection, 'post_score', state.ranges.post_score, 'Post Score (Final belief)', renderAll);
+  renderDualSlider(numSection, 'change_score', state.ranges.change_score, 'Change Score (Pre − Post)', renderAll);
   root.appendChild(numSection);
 
   // 5. Code Filters & CNF Query Builder
@@ -723,11 +728,12 @@ function renderFilters(){
       const chip = el('div', {
         class:'code-chip' + (mode ? ' mode-'+mode : ''),
         style:`--chip-color:${color}`,
-        'data-code': s.code
+        'data-code': s.code,
+        title: s.definition || (famLabel(f.family) + ' · ' + subLabel(s.sub))
       });
       const cnt = facetCounts.get(s.code) || 0;
       chip.append(
-        document.createTextNode((s.sub || famLabel(f.family)) + ' '),
+        document.createTextNode((subLabel(s.sub) || famLabel(f.family)) + ' '),
         el('span', {class:'n'}, `${cnt}`)
       );
       chip.addEventListener('click', ()=>toggleCodeInQuery(s.code));
@@ -793,9 +799,9 @@ function codeFamilyOf(code){
 function labelForCode(code){
   for(const f of FAMILIES){
     const s = f.subs.find(s=>s.code===code);
-    if(s) return famLabel(f.family) + (s.sub ? ' · ' + s.sub : '');
+    if(s) return famLabel(f.family) + (s.sub ? ' · ' + subLabel(s.sub) : '');
   }
-  return code;
+  return code.replace(/-/g, ' ');
 }
 
 function highlightCode(code, on){
@@ -1008,14 +1014,14 @@ function renderCard(conv, turnFlags){
         const chip = el('span', {
           class:'turn-code-chip',
           'data-code': c.code,
-          title: c.definition || c.code
+          title: c.definition || (famLabel(c.family) + ' · ' + subLabel(c.sub))
         });
         chip.style.setProperty('--chip-bg', hexToRgba(color, 0.12));
         chip.style.setProperty('--chip-fg', color);
         chip.style.setProperty('--chip-border', hexToRgba(color, 0.35));
         chip.append(
           el('span', {class:'fam'}, famLabel(c.family) + (c.sub? ' · ':'')),
-          c.sub || ''
+          subLabel(c.sub) || ''
         );
         codesWrap.appendChild(chip);
       });

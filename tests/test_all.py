@@ -13,6 +13,32 @@ def test_dataset():
     assert data['meta']['n_llm_conversations'] == 909
     assert sum(len(c['turns']) for c in data['conversations']) == 4548
 
+    # Verify coders naming (feedback 3: only 'LLM', no model names)
+    assert data['meta']['coders'] == ['Coder_A', 'Coder_B', 'Coder_C', 'LLM']
+    for c in data['conversations']:
+        if c['source'] == 'llm':
+            assert c['coder'] == 'LLM', f"Expected coder 'LLM', got '{c['coder']}'"
+    for coder in data['meta']['coders']:
+        assert 'gemini' not in coder.lower() and 'flash' not in coder.lower() and '3.7' not in coder, f"Unexpected model name in coder: {coder}"
+
+    # Verify custom Belief State ordering (feedback 1: certain, incertain, high/low investment, high/low strength, maintaining, repeat, becoming, turning point)
+    bs_family = next((f for f in data['families'] if f['family'] == 'BELIEF-STATE'), None)
+    assert bs_family is not None, "BELIEF-STATE family not found"
+    expected_bs_order = [
+        'BELIEF-STATE-Certain',
+        'BELIEF-STATE-Uncertain',
+        'BELIEF-STATE-High-Investment',
+        'BELIEF-STATE-Low-Investment',
+        'BELIEF-STATE-High-Strength',
+        'BELIEF-STATE-Low-Strength',
+        'BELIEF-STATE-Maintaining-Certainty',
+        'BELIEF-STATE-Repetition-or-Resistance',
+        'BELIEF-STATE-Becoming-Uncertain',
+        'BELIEF-STATE-Turning-Point'
+    ]
+    actual_bs_order = [s['code'] for s in bs_family['subs']]
+    assert actual_bs_order == expected_bs_order, f"Expected BELIEF-STATE order {expected_bs_order}, got {actual_bs_order}"
+
     # Verify pre_scores all start from 50 (feedback 4)
     min_pre = min(c['pre_score'] for c in data['conversations'])
     assert min_pre >= 50.0, f"Expected min pre_score >= 50, got {min_pre}"
@@ -48,7 +74,7 @@ def test_dataset():
     for ef in expected_fams:
         assert ef in human_fams, f"Human conversations missing family: {ef}"
 
-    print(f"✓ Dataset integrity test passed (1,137 convs, 4,548 turns, min pre_score={min_pre}, zero LLM BELIEF-STATE codes, full Human 8-family publishable taxonomy, AI responses populated)")
+    print(f"✓ Dataset integrity test passed (1,137 convs, 4,548 turns, Belief State custom order verified, 'LLM' naming verified, zero LLM BELIEF-STATE codes, full Human 8-family taxonomy)")
     return data
 
 
@@ -69,6 +95,7 @@ def test_html_files():
         assert 'id="cohortSummaryPanel"' in content
         assert 'id="statsBar"' in content
         assert 'turn-ai-wrap' in content
+        assert 'Gemini 3.7' not in content, f"Found model name 'Gemini 3.7' in {filename}"
         
         # Check embedded JSON
         m = re.search(r'<script id="app-data" type="application/json">(.*?)</script>', content, re.DOTALL)
