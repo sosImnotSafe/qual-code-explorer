@@ -12,13 +12,15 @@ const FAMILY_COLOR_VAR = {
   'EVIDENCE': '--fam-evidence',
   'CONVERSATION': '--fam-conversation',
   'ATTITUDE': '--fam-attitude',
-  'FUTURE-STANCE': '--fam-future-stance',
-  'EMOTIONAL-RESPONSE': '--fam-emotional-response',
+  'BELIEF-OUTLOOK': '--fam-belief-outlook',
+  'IDENTITY-INVOCATION': '--fam-identity-invocation',
   'ENGAGEMENT': '--fam-engagement',
+  'FUTURE-STANCE': '--fam-belief-outlook',
+  'EMOTIONAL-RESPONSE': '--fam-identity-invocation',
   'SIGNAL': '--fam-belief-state',
   'EXTRA': '--fam-conversation',
-  'FUTURE': '--fam-future-stance',
-  'INVOKE': '--fam-emotional-response',
+  'FUTURE': '--fam-belief-outlook',
+  'INVOKE': '--fam-identity-invocation',
   'LACK': '--fam-engagement',
   'Mismatch': '--fam-mismatch'
 };
@@ -34,13 +36,15 @@ function famLabel(fam){
     'EVIDENCE': 'Evidence',
     'CONVERSATION': 'Conversation',
     'ATTITUDE': 'Attitude',
-    'FUTURE-STANCE': 'Future Stance',
-    'EMOTIONAL-RESPONSE': 'Emotional Response',
+    'BELIEF-OUTLOOK': 'Belief Outlook',
+    'IDENTITY-INVOCATION': 'Identity Invocation',
     'ENGAGEMENT': 'Engagement',
+    'FUTURE-STANCE': 'Belief Outlook',
+    'EMOTIONAL-RESPONSE': 'Identity Invocation',
     'SIGNAL': 'Belief State',
     'EXTRA': 'Conversation',
-    'FUTURE': 'Future Stance',
-    'INVOKE': 'Emotional Response',
+    'FUTURE': 'Belief Outlook',
+    'INVOKE': 'Identity Invocation',
     'LACK': 'Engagement',
     'Mismatch': 'Mismatch'
   };
@@ -55,7 +59,6 @@ function subLabel(sub){
 // ---------------- State ----------------
 const state = {
   filterUnit: 'turn', // 'turn' (turn-level criteria) | 'participant' (participant-level criteria)
-  source: 'all', // 'all' | 'human' | 'llm'
   coders: new Set(META.coders),
   search: '',
   sampleNumberSearch: '',
@@ -80,7 +83,6 @@ let renderedCount = 50;
 function stateToUrl(){
   const params = new URLSearchParams();
   if(state.filterUnit !== 'turn') params.set('unit', state.filterUnit);
-  if(state.source !== 'all') params.set('source', state.source);
   if(state.coders.size < META.coders.length){
     params.set('coder', Array.from(state.coders).join(','));
   }
@@ -119,10 +121,6 @@ function parseUrlToState(){
   if(params.has('unit') || params.has('scope')){
     const u = (params.get('unit') || params.get('scope')).toLowerCase();
     if(['turn', 'participant'].includes(u)) state.filterUnit = u;
-  }
-  if(params.has('source')){
-    const src = params.get('source').toLowerCase();
-    if(['all', 'human', 'llm'].includes(src)) state.source = src;
   }
   if(params.has('coder')){
     const coders = params.get('coder').split(',').map(s=>s.trim()).filter(Boolean);
@@ -188,7 +186,6 @@ function parseUrlToState(){
 }
 // ---------------- Filtering Logic ----------------
 function convMatchesBase(conv){
-  if(state.source !== 'all' && conv.source !== state.source) return false;
   if(state.coders.size > 0 && !state.coders.has(conv.coder)) return false;
   
   if(state.sampleNumberSearch && String(conv.sample_number) !== state.sampleNumberSearch && String(conv.original_sample_number) !== state.sampleNumberSearch) return false;
@@ -520,8 +517,8 @@ function renderFilters(){
   unitSection.append(el('div', {class:'filter-section-title'}, 'Filter Evaluation Unit'));
   const unitSwitch = el('div', {class:'source-switch'});
   const unitOpts = [
-    {id:'turn', label:'Turn Level (Local)'},
-    {id:'participant', label:'Participant (Global)'}
+    {id:'turn', label:'Turn Level'},
+    {id:'participant', label:'Participant'}
   ];
   unitOpts.forEach(opt=>{
     const optEl = el('div', {class:'source-option' + (state.filterUnit===opt.id ? ' active' : '')}, opt.label);
@@ -532,34 +529,9 @@ function renderFilters(){
     unitSwitch.appendChild(optEl);
   });
   unitSection.appendChild(unitSwitch);
-  unitSection.appendChild(el('div', {style:'font-size:11px; color:var(--ink-muted); margin-top:4px; line-height:1.35;'},
-    state.filterUnit === 'participant'
-      ? 'Participant mode: codes evaluate across the entire conversation.'
-      : 'Turn mode: codes evaluate strictly within individual turns.'
-  ));
   root.appendChild(unitSection);
 
-  // 1. Source selector
-  const srcSection = el('div', {class:'filter-section'});
-  srcSection.append(el('div', {class:'filter-section-title'}, 'Dataset Source'));
-  const srcSwitch = el('div', {class:'source-switch'});
-  const opts = [
-    {id:'all', label:`All (${META.n_conversations})`},
-    {id:'human', label:`Human (${META.n_human_conversations})`},
-    {id:'llm', label:`LLM (${META.n_llm_conversations})`}
-  ];
-  opts.forEach(opt=>{
-    const optEl = el('div', {class:'source-option' + (state.source===opt.id ? ' active' : '')}, opt.label);
-    optEl.addEventListener('click', ()=>{
-      state.source = opt.id;
-      renderAll();
-    });
-    srcSwitch.appendChild(optEl);
-  });
-  srcSection.appendChild(srcSwitch);
-  root.appendChild(srcSection);
-
-  // 2. Coders selector
+  // 1. Coders selector
   const coderSection = el('div', {class:'filter-section'});
   const coderTitle = el('div', {class:'filter-section-title'}, [
     document.createTextNode('Coders / Models'),
@@ -585,59 +557,17 @@ function renderFilters(){
   coderSection.appendChild(coderRow);
   root.appendChild(coderSection);
 
-  // 3. Search & IDs
-  const searchSection = el('div', {class:'filter-section'});
-  searchSection.append(el('div', {class:'filter-section-title'}, 'Search & Navigation'));
-  const searchBox = el('div', {class:'search-box'});
-  searchBox.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
-  const searchInput = el('input', {type:'text', placeholder:'Search within turn text…', value:state.search});
-  searchInput.addEventListener('input', (e)=>{
-    state.search = e.target.value;
-    renderedCount = 50;
-    renderFeed();
-    renderStats();
-    renderActiveFiltersBar();
-    updateUrl();
-  });
-  searchBox.appendChild(searchInput);
-  searchSection.appendChild(searchBox);
-
-  const idRow = el('div', {style:'display:flex; gap:8px; margin-top:8px;'});
-  const partCol = el('div', {style:'flex:1;'});
-  partCol.append(
-    el('label', {style:'display:block; font-size:11px; color:var(--ink-muted); margin-bottom:3px;'}, 'Participant ID'),
-    el('input', {type:'number', placeholder:'All', value:state.participantIdSearch || '', style:'width:100%; padding:6px; border:1px solid var(--line); border-radius:4px; font-size:12px; font-family:var(--font-mono);',
-      oninput:(e)=>{
-        state.participantIdSearch = e.target.value.trim();
-        renderedCount = 50;
-        renderAll();
-      }
-    })
-  );
-  const sampleCol = el('div', {style:'flex:1;'});
-  sampleCol.append(
-    el('label', {style:'display:block; font-size:11px; color:var(--ink-muted); margin-bottom:3px;'}, 'Sample #'),
-    el('input', {type:'number', placeholder:'All', value:state.sampleNumberSearch || '', style:'width:100%; padding:6px; border:1px solid var(--line); border-radius:4px; font-size:12px; font-family:var(--font-mono);',
-      oninput:(e)=>{
-        state.sampleNumberSearch = e.target.value.trim();
-        renderedCount = 50;
-        renderAll();
-      }
-    })
-  );
-  idRow.append(partCol, sampleCol);
-  searchSection.appendChild(idRow);
-
-  const turnRow = el('div', {style:'margin-top:8px;'});
-  turnRow.append(el('div', {style:'display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;'}, [
-    el('label', {style:'font-size:11px; color:var(--ink-muted);'}, 'Specific Turns (Multi-choice)'),
+  // 2. Specific Turns (Exactly under Coders / Models)
+  const turnSection = el('div', {class:'filter-section'});
+  const turnTitle = el('div', {class:'filter-section-title'}, [
+    document.createTextNode('Turns'),
     el('span', {class:'reset-link', onclick:()=>{
       state.selectedTurns = new Set([1, 2, 3, 4]);
       renderAll();
     }}, 'select all')
-  ]));
+  ]);
+  turnSection.appendChild(turnTitle);
   const turnPills = el('div', {class:'turn-pills-row'});
-  
   const allPill = el('div', {class:'turn-pill' + (state.selectedTurns.size === 4 ? ' active' : '')}, 'All');
   allPill.addEventListener('click', ()=>{
     state.selectedTurns = new Set([1, 2, 3, 4]);
@@ -661,16 +591,15 @@ function renderFilters(){
     });
     turnPills.appendChild(pill);
   });
-  turnRow.appendChild(turnPills);
-  searchSection.appendChild(turnRow);
-  root.appendChild(searchSection);
+  turnSection.appendChild(turnPills);
+  root.appendChild(turnSection);
 
-  // 4. Numeric Belief Ranges
+  // 3. Numeric Belief Ranges
   const numSection = el('div', {class:'filter-section'});
   const numTitle = el('div', {class:'filter-section-title'}, [
     document.createTextNode('Belief Metrics'),
     el('span', {class:'reset-link', onclick:()=>{
-      state.ranges.pre_score = {min:0,max:100,lo:0,hi:100};
+      state.ranges.pre_score = {min:50,max:100,lo:50,hi:100};
       state.ranges.post_score = {min:0,max:100,lo:0,hi:100};
       state.ranges.change_score = {min:-40,max:100,lo:-40,hi:100};
       state.ranges.turn_number = {min:1,max:4,lo:1,hi:4};
@@ -683,15 +612,13 @@ function renderFilters(){
   renderDualSlider(numSection, 'change_score', state.ranges.change_score, 'Change Score (Pre − Post)', renderAll);
   root.appendChild(numSection);
 
-  // 5. Code Filters & CNF Query Builder
+  // 4. Code Filters & CNF Query Builder
   const codeSection = el('div', {class:'filter-section'});
   const codeTitle = el('div', {class:'filter-section-title'}, [
     document.createTextNode('Qualitative Codes'),
     el('span', {class:'reset-link', onclick:()=>{ state.queryGroups = []; renderAll(); }}, 'clear')
   ]);
   codeSection.appendChild(codeTitle);
-  codeSection.appendChild(el('div', {style:'font-size:11px; color:var(--ink-muted); margin:-4px 0 10px; line-height:1.4;'},
-    'Click a code to add it as an AND clause. Click again to negate (! NOT), click once more to remove. Connectors toggle between AND and OR.'));
 
   const queryBox = el('div', {class:'query-builder'});
   renderQueryBuilder(queryBox);
@@ -815,12 +742,6 @@ function renderActiveFiltersBar(){
   bar.innerHTML = '';
   const pills = [];
 
-  if(state.source !== 'all'){
-    pills.push({
-      label: `Source: ${state.source.toUpperCase()}`,
-      onremove: ()=>{ state.source = 'all'; renderAll(); }
-    });
-  }
   if(state.coders.size < META.coders.length){
     pills.push({
       label: `Coders: ${Array.from(state.coders).map(c=>c.replace('Coder_','Coder ')).join(', ')}`,
@@ -905,7 +826,6 @@ function renderActiveFiltersBar(){
 
 function resetAllFilters(){
   state.filterUnit = 'turn';
-  state.source = 'all';
   state.coders = new Set(META.coders);
   state.search = '';
   state.sampleNumberSearch = '';
@@ -998,8 +918,7 @@ function renderCard(conv, turnFlags){
         copyText(url, `Copied link to Turn ${t.turn_number} (Participant #${conv.participant_id})!`);
       }
     }, [
-      el('span', {html:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'}),
-      document.createTextNode('cite')
+      el('span', {html:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'})
     ]);
     metaHeader.appendChild(turnLinkBtn);
     content.appendChild(metaHeader);
@@ -1032,7 +951,6 @@ function renderCard(conv, turnFlags){
 
     if(t.ai_response && t.ai_response.trim()){
       const aiText = t.ai_response.trim();
-      const aiWords = aiText.split(/\s+/).length;
       const aiWrap = el('div', {class:'turn-ai-wrap' + (state.expandAllAi ? ' open' : '')});
       
       const toggleBar = el('div', {class:'turn-ai-toggle'}, [
@@ -1042,7 +960,6 @@ function renderCard(conv, turnFlags){
         ]),
         el('span', {class:'turn-ai-summary'}, aiText.slice(0, 80).replace(/\s+/g, ' ') + '…'),
         el('span', {class:'turn-ai-hint'}, [
-          document.createTextNode(`${aiWords} words`),
           el('span', {class:'turn-ai-chevron', html:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>'})
         ])
       ]);
@@ -1072,22 +989,113 @@ function hexToRgba(hex, alpha){
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
+// ---------------- Rendering: Search & Navigation Widget ----------------
+function renderSearchNavWidget(){
+  const container = document.getElementById('searchNavWidget');
+  if(!container) return;
+  container.innerHTML = '';
+
+  const hasActiveSearch = state.search || state.participantIdSearch || state.sampleNumberSearch || state.selectedTurns.size < 4;
+
+  const header = el('div', {class:'widget-header'}, [
+    el('div', {class:'widget-title'}, [
+      el('span', {html:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'}),
+      document.createTextNode('Search & Navigation')
+    ]),
+    hasActiveSearch ? el('span', {class:'reset-link', onclick:()=>{
+      state.search = '';
+      state.participantIdSearch = '';
+      state.sampleNumberSearch = '';
+      state.selectedTurns = new Set([1, 2, 3, 4]);
+      renderedCount = 50;
+      renderAll();
+    }}, 'reset') : null
+  ]);
+  container.appendChild(header);
+
+  // Search input
+  const searchBox = el('div', {class:'search-box'});
+  searchBox.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
+  const searchInput = el('input', {type:'text', placeholder:'Search within turn text…', value:state.search});
+  searchInput.addEventListener('input', (e)=>{
+    state.search = e.target.value;
+    renderedCount = 50;
+    renderFeed();
+    renderStats();
+    renderActiveFiltersBar();
+    updateUrl();
+  });
+  searchBox.appendChild(searchInput);
+  container.appendChild(searchBox);
+
+  // Bottom row: IDs
+  const bottomRow = el('div', {class:'search-nav-bottom-row'});
+  
+  const partGroup = el('div', {class:'search-input-group'});
+  partGroup.append(
+    el('label', {}, 'Participant ID'),
+    el('input', {
+      type:'number',
+      placeholder:'All (e.g. 7)',
+      value:state.participantIdSearch || '',
+      oninput:(e)=>{
+        state.participantIdSearch = e.target.value.trim();
+        renderedCount = 50;
+        renderAll();
+      }
+    })
+  );
+
+  const sampleGroup = el('div', {class:'search-input-group'});
+  sampleGroup.append(
+    el('label', {}, 'Sample #'),
+    el('input', {
+      type:'number',
+      placeholder:'All (e.g. 101)',
+      value:state.sampleNumberSearch || '',
+      oninput:(e)=>{
+        state.sampleNumberSearch = e.target.value.trim();
+        renderedCount = 50;
+        renderAll();
+      }
+    })
+  );
+
+  bottomRow.append(partGroup, sampleGroup);
+  container.appendChild(bottomRow);
+}
+
 // ---------------- Rendering: Cohort Statistics & Feed ----------------
 function renderCohortSummary(results, totalMatchingTurns){
   const panel = document.getElementById('cohortSummaryPanel');
   if(!panel) return;
-  if(!results.length){
-    panel.innerHTML = '';
-    panel.style.display = 'none';
-    return;
-  }
-  panel.style.display = 'block';
   panel.innerHTML = '';
 
-  const n = results.length;
-  const preScores = results.map(r => r.conv.pre_score);
-  const postScores = results.map(r => r.conv.post_score);
-  const changeScores = results.map(r => r.conv.change_score);
+  const n = results ? results.length : 0;
+  
+  // Header
+  const header = el('div', {class:'widget-header'}, [
+    el('div', {class:'widget-title'}, [
+      el('span', {html:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'}),
+      document.createTextNode('Filtered Cohort Statistics')
+    ]),
+    el('div', {class:'cohort-summary-meta'}, [
+      el('b', {}, `${n}`),
+      document.createTextNode(` / ${META.n_conversations} (${((n/META.n_conversations)*100).toFixed(1)}%) · `),
+      el('b', {}, `${totalMatchingTurns}`),
+      document.createTextNode(` turns`)
+    ])
+  ]);
+  panel.appendChild(header);
+
+  if(n === 0){
+    panel.appendChild(el('div', {class:'cohort-empty-note'}, 'No active conversations match current filter criteria.'));
+    return;
+  }
+
+  const preScores = results.map(r => r.conv.pre_score).filter(v=>v!=null);
+  const postScores = results.map(r => r.conv.post_score).filter(v=>v!=null);
+  const changeScores = results.map(r => r.conv.change_score).filter(v=>v!=null);
 
   function calcStats(arr){
     if(!arr.length) return {mean:0, median:0, min:0, max:0, std:0};
@@ -1106,111 +1114,44 @@ function renderCohortSummary(results, totalMatchingTurns){
   const preStats = calcStats(preScores);
   const postStats = calcStats(postScores);
   const changeStats = calcStats(changeScores);
-
-  const reducedCount = changeScores.filter(c => c > 0).length;
-  const reducedPct = ((reducedCount / n) * 100).toFixed(1);
-
-  // Frequency of qualitative codes in this filtered cohort
-  const cohortCodeCounts = new Map();
-  results.forEach(({conv, turnFlags})=>{
-    conv.turns.forEach((t, i)=>{
-      if(state.filterUnit === 'participant' || turnFlags[i]){
-        t.codes.forEach(c=>{
-          cohortCodeCounts.set(c.code, (cohortCodeCounts.get(c.code) || 0) + 1);
-        });
-      }
-    });
-  });
-
-  const topCodes = Array.from(cohortCodeCounts.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-
-  // Header
-  const header = el('div', {class:'cohort-summary-header'}, [
-    el('div', {class:'cohort-summary-title'}, [
-      el('span', {html:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'}),
-      document.createTextNode('Filtered Cohort Statistics')
-    ]),
-    el('div', {class:'cohort-summary-meta'}, [
-      document.createTextNode('Cohort size: '),
-      el('b', {}, `${n}`),
-      document.createTextNode(` / ${META.n_conversations} participants (${((n/META.n_conversations)*100).toFixed(1)}%) · `),
-      el('b', {}, `${totalMatchingTurns}`),
-      document.createTextNode(` / ${META.n_turns} matching turns`)
-    ])
-  ]);
-  panel.appendChild(header);
-
-  // Grid of Metric Cards
-  const grid = el('div', {class:'cohort-summary-grid'});
-
-  // 1. Pre-Score Card
-  const preCard = el('div', {class:'cohort-stat-card'}, [
-    el('div', {class:'cohort-stat-label'}, 'Pre-Score (Initial Belief)'),
-    el('div', {class:'cohort-stat-main'}, [
-      el('div', {class:'cohort-stat-val'}, preStats.mean.toFixed(1)),
-      el('div', {class:'cohort-stat-unit'}, `mean · σ ${preStats.std.toFixed(1)}`)
-    ]),
-    el('div', {class:'cohort-stat-sub'}, [
-      el('span', {}, `Median: ${preStats.median.toFixed(1)}`),
-      el('span', {}, `Range: [${preStats.min.toFixed(0)} – ${preStats.max.toFixed(0)}]`)
-    ])
-  ]);
-
-  // 2. Post-Score Card
-  const postCard = el('div', {class:'cohort-stat-card'}, [
-    el('div', {class:'cohort-stat-label'}, 'Post-Score (Final Belief)'),
-    el('div', {class:'cohort-stat-main'}, [
-      el('div', {class:'cohort-stat-val'}, postStats.mean.toFixed(1)),
-      el('div', {class:'cohort-stat-unit'}, `mean · σ ${postStats.std.toFixed(1)}`)
-    ]),
-    el('div', {class:'cohort-stat-sub'}, [
-      el('span', {}, `Median: ${postStats.median.toFixed(1)}`),
-      el('span', {}, `Range: [${postStats.min.toFixed(0)} – ${postStats.max.toFixed(0)}]`)
-    ])
-  ]);
-
-  // 3. Change Card
   const deltaVal = changeStats.mean;
-  const changeCard = el('div', {class:'cohort-stat-card'}, [
-    el('div', {class:'cohort-stat-label'}, 'Belief Reduction (Δ Pre − Post)'),
-    el('div', {class:'cohort-stat-main'}, [
-      el('div', {class:'cohort-stat-val', style: deltaVal > 0 ? 'color:var(--good);' : (deltaVal < 0 ? 'color:var(--warn);' : '')}, (deltaVal >= 0 ? '+' : '') + deltaVal.toFixed(1)),
-      el('div', {class:'cohort-stat-unit'}, `mean · σ ${changeStats.std.toFixed(1)}`)
+
+  const metricsGrid = el('div', {class:'cohort-metrics-row'});
+
+  // Pre
+  metricsGrid.appendChild(el('div', {class:'cohort-metric-cell'}, [
+    el('div', {class:'cohort-metric-name'}, 'Pre Score (Initial)'),
+    el('div', {class:'cohort-metric-main'}, [
+      el('span', {class:'cohort-metric-num'}, preStats.mean.toFixed(1)),
+      el('span', {class:'cohort-metric-sub'}, `σ ${preStats.std.toFixed(1)}`)
     ]),
-    el('div', {class:'cohort-stat-sub'}, [
-      el('span', {class:'badge-good'}, `${reducedPct}% reduced belief`),
-      el('span', {}, `Range: [${changeStats.min.toFixed(0)} – ${changeStats.max.toFixed(0)}]`),
-      el('span', {}, `Median: ${changeStats.median.toFixed(1)}`)
-    ])
-  ]);
+    el('div', {class:'cohort-metric-detail'}, `Med ${preStats.median.toFixed(1)} · [${preStats.min.toFixed(0)}–${preStats.max.toFixed(0)}]`)
+  ]));
 
-  grid.append(preCard, postCard, changeCard);
+  // Post
+  metricsGrid.appendChild(el('div', {class:'cohort-metric-cell'}, [
+    el('div', {class:'cohort-metric-name'}, 'Post Score (Final)'),
+    el('div', {class:'cohort-metric-main'}, [
+      el('span', {class:'cohort-metric-num'}, postStats.mean.toFixed(1)),
+      el('span', {class:'cohort-metric-sub'}, `σ ${postStats.std.toFixed(1)}`)
+    ]),
+    el('div', {class:'cohort-metric-detail'}, `Med ${postStats.median.toFixed(1)} · [${postStats.min.toFixed(0)}–${postStats.max.toFixed(0)}]`)
+  ]));
 
-  // 4. Top Qualitative Codes
-  if(topCodes.length > 0){
-    const topCodesRow = el('div', {class:'cohort-top-codes'}, [
-      el('div', {class:'cohort-top-codes-label'}, 'Top Cohort Codes:'),
-      el('div', {class:'cohort-top-codes-chips'}, topCodes.map(([code, cnt])=>{
-        const fam = codeFamilyOf(code);
-        const color = famColor(fam);
-        const chip = el('span', {
-          class:'turn-code-chip',
-          style:`--chip-bg:${hexToRgba(color, 0.12)}; --chip-fg:${color}; --chip-border:${hexToRgba(color, 0.35)}; cursor:pointer;`,
-          onclick:()=>toggleCodeInQuery(code),
-          title: `Filter by ${code}`
-        }, [
-          document.createTextNode(`${labelForCode(code)} `),
-          el('b', {style:'opacity:0.85; margin-left:3px;'}, `${cnt}`)
-        ]);
-        return chip;
-      }))
-    ]);
-    grid.appendChild(topCodesRow);
-  }
+  // Change
+  metricsGrid.appendChild(el('div', {class:'cohort-metric-cell'}, [
+    el('div', {class:'cohort-metric-name'}, 'Belief Change (Δ)'),
+    el('div', {class:'cohort-metric-main'}, [
+      el('span', {
+        class:'cohort-metric-num',
+        style: deltaVal > 0 ? 'color:var(--good);' : (deltaVal < 0 ? 'color:var(--warn);' : '')
+      }, (deltaVal >= 0 ? '+' : '') + deltaVal.toFixed(1)),
+      el('span', {class:'cohort-metric-sub'}, `σ ${changeStats.std.toFixed(1)}`)
+    ]),
+    el('div', {class:'cohort-metric-detail'}, `Med ${(changeStats.median>=0?'+':'') + changeStats.median.toFixed(1)} · [${changeStats.min.toFixed(0)}–${changeStats.max.toFixed(0)}]`)
+  ]));
 
-  panel.appendChild(grid);
+  panel.appendChild(metricsGrid);
 }
 
 // ---------------- Rendering: Feed & Stats ----------------
@@ -1258,6 +1199,7 @@ function renderStats(){
 
 function renderAll(){
   renderFilters();
+  renderSearchNavWidget();
   renderFeed();
   renderStats();
   renderActiveFiltersBar();

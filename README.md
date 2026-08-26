@@ -13,20 +13,20 @@ The explorer unifies the complete dataset of **1,137 conversations** (4,548 dial
    - Comprehensive 8-family qualitative publishable codebook:
      - `BELIEF-STATE` (10 codes)
      - `THEME` (12 codes)
-     - `EVIDENCE` (12 codes)
+     - `EVIDENCE` (11 codes)
      - `CONVERSATION` (7 codes)
      - `ATTITUDE` (9 codes)
-     - `FUTURE-STANCE` (4 codes)
-     - `EMOTIONAL-RESPONSE` (3 codes)
+     - `BELIEF-OUTLOOK` (4 codes)
+     - `IDENTITY-INVOCATION` (3 codes)
      - `ENGAGEMENT` (2 codes)
 2. **LLM-Coded Corpus (909 conversations / 3,636 turns)**:
-   - Coded with `gemini-3.7-flash (OvO V4)`.
+   - Coded with `LLM`.
    - Per specification, all `BELIEF-STATE` codes have been removed from the LLM-coded data.
    - Retains the core dialogue families: `EVIDENCE` and `THEME`.
 3. **Full Dialogue Context with AI Responses**:
    - Every conversation includes all 4 dialogue turns, complete with the AI assistant's counterarguments (folded by default, expandable on click or globally via topbar toggle).
-4. **Cohort Statistics Panel**:
-   - Dynamically calculates and displays the active cohort's Pre-score, Post-score, and Change score distributions (Mean, Median, Range `[min–max]`, Std Dev, % reduced belief, and top qualitative codes).
+4. **Dashboard Header & Cohort Statistics**:
+   - Includes a top dashboard placing **Search & Navigation** side-by-side with **Filtered Cohort Statistics** (Pre-score, Post-score, and Change score distributions with Mean, Median, Range `[min–max]`, and Std Dev `σ`).
 5. **Initial Belief Pre-Scores**:
    - Pre-score slider range correctly calibrated to start at **50** (50–100 scale).
 
@@ -51,7 +51,7 @@ The app features a bidirectional deep-linking engine. Every filter change update
 | **Having Label X** | `?codes=THEME-Domestic-Politics` |
 | **NOT Having Label Y** | `?codes=!EVIDENCE-Anomalies` |
 | **AND / OR Combinations** | `?codes=(THEME-Domestic-Politics\|THEME-Historical-Event),(!EVIDENCE-Anomalies)` |
-| **Full Combined Citation** | `?unit=participant&source=human&coder=Coder_A&codes=EMOTIONAL-RESPONSE-General-Identity-or-Principles&pre=50..100` |
+| **Full Combined Citation** | `?unit=participant&coder=Coder_A&codes=IDENTITY-INVOCATION-General-Identity-or-Principles&pre=50..100` |
 
 ### Built-in Sharing Tools:
 - **"Share View" Topbar Button**: Copies the current view's permanent URL to the clipboard with one click.

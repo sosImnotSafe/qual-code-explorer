@@ -125,35 +125,35 @@ The **user** employs a clear logical fallacy as the main argumentative move.
 
 Use **CONVERSATION-Source-Importance** when the user gives **any clue that the *source* of information is itself important to them** — that they are the kind of person who **pays attention to where information comes from**, and this shapes their belief.
 
-### FUTURE-STANCE
+### BELIEF-OUTLOOK
 
-#### `FUTURE-STANCE-Hedging`
+#### `BELIEF-OUTLOOK-Hedging`
 
-Use **FUTURE-STANCE-Hedging** when, by the end (or near the end) of the conversation, the **user does not clearly state either their current stance or their future stance**, and instead uses **vague, conditional, or non-committal language** about what they might think or do later.
+Use **BELIEF-OUTLOOK-Hedging** when, by the end (or near the end) of the conversation, the **user does not clearly state either their current stance or their future stance**, and instead uses **vague, conditional, or non-committal language** about what they might think or do later.
 
-#### `FUTURE-STANCE-Apathy`
+#### `BELIEF-OUTLOOK-Indifference`
 
-(I Don’t Care) Expresses **future apathy or lack of motivation** to change or engage.
+(I Don’t Care) Expresses **future indifference, apathy, or lack of motivation** to change or engage.
 
-#### `FUTURE-STANCE-Moral-Commitment`
+#### `BELIEF-OUTLOOK-Moral-Commitment`
 
 Future-oriented statements grounded in **moral commitments.**
 
-#### `FUTURE-STANCE-Openness-to-Change`
+#### `BELIEF-OUTLOOK-Openness-to-Change`
 
 Clearly states **willingness to reconsider, learn more, or potentially change** in the future.
 
-### EMOTIONAL-RESPONSE
+### IDENTITY-INVOCATION
 
-#### `EMOTIONAL-RESPONSE-General-Identity-or-Principles`
+#### `IDENTITY-INVOCATION-General-Identity-or-Principles`
 
 When the conversation **triggers emotion**, and the speaker responds by invoking **broad identities or principles** (without specifically moral or partisan emphasis).
 
-#### `EMOTIONAL-RESPONSE-Morality`
+#### `IDENTITY-INVOCATION-Morality`
 
 Emotionally triggered invocation of **moral values** (good/evil, right/wrong, justice/injustice).
 
-#### `EMOTIONAL-RESPONSE-Partisanship`
+#### `IDENTITY-INVOCATION-Partisanship`
 
 Emotionally triggered invocation of **parties, ideologies, or political camps** (“us vs them” politically).
 

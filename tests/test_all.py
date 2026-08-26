@@ -59,6 +59,13 @@ def test_dataset():
     ]
     assert len(llm_signals) == 0, f"Found {len(llm_signals)} BELIEF-STATE codes in LLM!"
 
+    # Verify Belief Outlook subcodes (feedback: Indifference, Hedging, Moral-Commitment, Openness-to-Change)
+    bo_family = next((f for f in data['families'] if f['family'] == 'BELIEF-OUTLOOK'), None)
+    assert bo_family is not None, "BELIEF-OUTLOOK family not found"
+    bo_codes = [s['code'] for s in bo_family['subs']]
+    assert 'BELIEF-OUTLOOK-Indifference' in bo_codes, f"BELIEF-OUTLOOK-Indifference not found in {bo_codes}"
+    assert 'BELIEF-OUTLOOK-Apathy' not in bo_codes, f"Old Apathy code found in {bo_codes}"
+
     # Verify human conversations retain all 8 publishable families (feedback 1)
     human_fams = set(code['family'] for c in data['conversations'] if c['source'] == 'human' for t in c['turns'] for code in t['codes'])
     expected_fams = {
@@ -67,14 +74,14 @@ def test_dataset():
         'EVIDENCE',
         'CONVERSATION',
         'ATTITUDE',
-        'FUTURE-STANCE',
-        'EMOTIONAL-RESPONSE',
+        'BELIEF-OUTLOOK',
+        'IDENTITY-INVOCATION',
         'ENGAGEMENT'
     }
     for ef in expected_fams:
         assert ef in human_fams, f"Human conversations missing family: {ef}"
 
-    print(f"✓ Dataset integrity test passed (1,137 convs, 4,548 turns, Belief State custom order verified, 'LLM' naming verified, zero LLM BELIEF-STATE codes, full Human 8-family taxonomy)")
+    print(f"✓ Dataset integrity test passed (1,137 convs, 4,548 turns, Belief State custom order verified, 'LLM' naming verified, zero LLM BELIEF-STATE codes, full Human 8-family taxonomy with Belief Outlook & Identity Invocation)")
     return data
 
 
@@ -93,8 +100,11 @@ def test_html_files():
         assert 'id="toggleAllAiBtn"' in content
         assert 'id="activeFiltersBar"' in content
         assert 'id="cohortSummaryPanel"' in content
+        assert 'id="searchNavWidget"' in content
         assert 'id="statsBar"' in content
         assert 'turn-ai-wrap' in content
+        assert 'Belief Outlook' in content
+        assert 'Identity Invocation' in content
         assert 'Gemini 3.7' not in content, f"Found model name 'Gemini 3.7' in {filename}"
         
         # Check embedded JSON

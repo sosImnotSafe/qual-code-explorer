@@ -19,10 +19,26 @@ def load_code_mapping(base_dir):
         'EVIDENCE-Eyewitness/Anecdotal': 'EVIDENCE-Eyewitness',
         'EVIDENCE-Anecdotal': 'EVIDENCE-Personal-Anecdote',
         'EXTRA-Fallacy User': 'CONVERSATION-Logical-Fallacy',
-        'FUTURE-IDC (I Don\'t Care)': 'FUTURE-STANCE-Apathy',
+        'FUTURE-IDC (I Don\'t Care)': 'BELIEF-OUTLOOK-Indifference',
+        'FUTURE-IDC': 'BELIEF-OUTLOOK-Indifference',
+        'FUTURE-Hedging': 'BELIEF-OUTLOOK-Hedging',
+        'FUTURE-Moral': 'BELIEF-OUTLOOK-Moral-Commitment',
+        'FUTURE-Open': 'BELIEF-OUTLOOK-Openness-to-Change',
+        'FUTURE-STANCE-Apathy': 'BELIEF-OUTLOOK-Indifference',
+        'FUTURE-STANCE-Indifference': 'BELIEF-OUTLOOK-Indifference',
+        'BELIEF-OUTLOOK-Apathy': 'BELIEF-OUTLOOK-Indifference',
+        'FUTURE-STANCE-Hedging': 'BELIEF-OUTLOOK-Hedging',
+        'FUTURE-STANCE-Moral-Commitment': 'BELIEF-OUTLOOK-Moral-Commitment',
+        'FUTURE-STANCE-Openness-to-Change': 'BELIEF-OUTLOOK-Openness-to-Change',
+        'INVOKE-General': 'IDENTITY-INVOCATION-General-Identity-or-Principles',
+        'INVOKE-Morality': 'IDENTITY-INVOCATION-Morality',
+        'INVOKE-Partisanship': 'IDENTITY-INVOCATION-Partisanship',
+        'EMOTIONAL-RESPONSE-General-Identity-or-Principles': 'IDENTITY-INVOCATION-General-Identity-or-Principles',
+        'EMOTIONAL-RESPONSE-Morality': 'IDENTITY-INVOCATION-Morality',
+        'EMOTIONAL-RESPONSE-Partisanship': 'IDENTITY-INVOCATION-Partisanship',
         'THEME-Others': 'THEME-Government-Cover-Up',
         'EXTRA-Others': 'CONVERSATION-Topic-Shift',
-        'FUTURE-Others': 'FUTURE-STANCE-Hedging',
+        'FUTURE-Others': 'BELIEF-OUTLOOK-Hedging',
         'EVIDENCE-Others': 'EVIDENCE-Unspecified-Source'
     }
     for k, v in aliases.items():
@@ -86,7 +102,7 @@ def build_data():
                 continue
             mapped = code_mapping.get(raw_c, raw_c)
             parts = mapped.split('-')
-            if mapped.startswith(('FUTURE-STANCE', 'EMOTIONAL-RESPONSE', 'BELIEF-STATE')):
+            if mapped.startswith(('BELIEF-OUTLOOK', 'IDENTITY-INVOCATION', 'FUTURE-STANCE', 'EMOTIONAL-RESPONSE', 'BELIEF-STATE')):
                 fam = '-'.join(parts[:2])
                 sub = '-'.join(parts[2:])
             else:
@@ -212,8 +228,8 @@ def build_data():
         'EVIDENCE',
         'CONVERSATION',
         'ATTITUDE',
-        'FUTURE-STANCE',
-        'EMOTIONAL-RESPONSE',
+        'BELIEF-OUTLOOK',
+        'IDENTITY-INVOCATION',
         'ENGAGEMENT'
     ]
     families = []
