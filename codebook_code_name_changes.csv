@@ -1,0 +1,60 @@
+previous_code,new_code,changed
+ATTITUDE-AI-Negative,ATTITUDE-AI-Negative,no
+ATTITUDE-AI-Positive,ATTITUDE-AI-Positive,no
+ATTITUDE-Conspiracy-Negative,ATTITUDE-Conspiracy-Negative,no
+ATTITUDE-Conspiracy-Positive,ATTITUDE-Conspiracy-Positive,no
+ATTITUDE-Media,ATTITUDE-Media,no
+ATTITUDE-Others,ATTITUDE-Other,yes
+ATTITUDE-Politics,ATTITUDE-Politics,no
+ATTITUDE-Science-Negative,ATTITUDE-Science-Negative,no
+ATTITUDE-Science-Positive,ATTITUDE-Science-Positive,no
+EVIDENCE-Analogy,EVIDENCE-Analogy,no
+EVIDENCE-Anecdotal,EVIDENCE-Personal-Anecdote,yes
+EVIDENCE-Anomalies,EVIDENCE-Anomalies,no
+EVIDENCE-Character Based,EVIDENCE-Character-Credibility,yes
+EVIDENCE-Expert,EVIDENCE-Expert-Testimony,yes
+EVIDENCE-Eyewitness,EVIDENCE-Eyewitness,no
+EVIDENCE-Media/Documents,EVIDENCE-Media-or-Documents,yes
+EVIDENCE-Moral Framing,EVIDENCE-Moral-Reasoning,yes
+EVIDENCE-Motive Based,EVIDENCE-Motive,yes
+EVIDENCE-Social Proof,EVIDENCE-Social-Proof,yes
+EVIDENCE-Stats / Numbers,EVIDENCE-Statistics-or-Numbers,yes
+EVIDENCE-Unspecified Sources,EVIDENCE-Unspecified-Source,yes
+EXTRA-Change Topic,CONVERSATION-Topic-Shift,yes
+EXTRA-Debate,CONVERSATION-Counterargument,yes
+EXTRA-Ev to Value,CONVERSATION-Shift-to-Values,yes
+EXTRA-Question-Follow-Up,CONVERSATION-Follow-Up-Question,yes
+EXTRA-Question-New,CONVERSATION-New-Question,yes
+EXTRA-Fallacy-User,CONVERSATION-Logical-Fallacy,yes
+FUTURE-Hedging,FUTURE-STANCE-Hedging,yes
+FUTURE-IDC,FUTURE-STANCE-Apathy,yes
+FUTURE-Moral,FUTURE-STANCE-Moral-Commitment,yes
+FUTURE-Open,FUTURE-STANCE-Openness-to-Change,yes
+INVOKE-General,EMOTIONAL-RESPONSE-General-Identity-or-Principles,yes
+INVOKE-Morality,EMOTIONAL-RESPONSE-Morality,yes
+INVOKE-Partisanship,EMOTIONAL-RESPONSE-Partisanship,yes
+LACK-Attention,ENGAGEMENT-Low-Attention,yes
+LACK-Connection,ENGAGEMENT-Low-Connection,yes
+SIGNAL-Certain,BELIEF-STATE-Certain,yes
+SIGNAL-Become-Uncertain,BELIEF-STATE-Becoming-Uncertain,yes
+SIGNAL-Stay-Certain,BELIEF-STATE-Maintaining-Certainty,yes
+SIGNAL-Repeat/Resist,BELIEF-STATE-Repetition-or-Resistance,yes
+SIGNAL-Investment-High,BELIEF-STATE-High-Investment,yes
+SIGNAL-Investment-Low,BELIEF-STATE-Low-Investment,yes
+SIGNAL-Source-Importance,CONVERSATION-Source-Importance,yes
+SIGNAL-Strength-Strong,BELIEF-STATE-High-Strength,yes
+SIGNAL-Strength-Weak,BELIEF-STATE-Low-Strength,yes
+SIGNAL-Turning Point,BELIEF-STATE-Turning-Point,yes
+SIGNAL-Uncertain,BELIEF-STATE-Uncertain,yes
+THEME-Assassination,THEME-Assassination,no
+THEME-Corporation,THEME-Corporate-Power,yes
+THEME-Domestic Politics,THEME-Domestic-Politics,yes
+THEME-Elite,THEME-Elite-Privilege,yes
+THEME-Government Cover-up,THEME-Government-Cover-Up,yes
+THEME-Historical Event,THEME-Historical-Event,yes
+THEME-International Politics,THEME-International-Politics,yes
+THEME-Media,THEME-Media,no
+THEME-Money/Power,THEME-Money-and-Power,yes
+THEME-Science,THEME-Science-and-Technology,yes
+THEME-Secret Society,THEME-Secret-Society,yes
+THEME-Space,THEME-Space-and-UFOs,yes

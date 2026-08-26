@@ -1,7 +1,52 @@
 import csv
 import json
 import os
+import re
 from collections import defaultdict, Counter
+
+def load_code_mapping(base_dir):
+    mapping_file = os.path.join(base_dir, 'codebook_code_name_changes.csv')
+    mapping = {}
+    if os.path.exists(mapping_file):
+        with open(mapping_file, 'r', encoding='utf-8') as f:
+            for row in csv.DictReader(f):
+                p = row.get('previous_code', '').strip()
+                n = row.get('new_code', '').strip()
+                if p and n:
+                    mapping[p] = n
+
+    aliases = {
+        'EVIDENCE-Eyewitness/Anecdotal': 'EVIDENCE-Eyewitness',
+        'EVIDENCE-Anecdotal': 'EVIDENCE-Personal-Anecdote',
+        'EXTRA-Fallacy User': 'CONVERSATION-Logical-Fallacy',
+        'FUTURE-IDC (I Don\'t Care)': 'FUTURE-STANCE-Apathy',
+        'THEME-Others': 'THEME-Government-Cover-Up',
+        'EXTRA-Others': 'CONVERSATION-Topic-Shift',
+        'FUTURE-Others': 'FUTURE-STANCE-Hedging',
+        'EVIDENCE-Others': 'EVIDENCE-Unspecified-Source'
+    }
+    for k, v in aliases.items():
+        if k not in mapping:
+            mapping[k] = v
+
+    for v in list(mapping.values()):
+        mapping[v] = v
+    return mapping
+
+def parse_codebook_definitions(base_dir):
+    md_path = os.path.join(base_dir, 'codebook_publishable_final.md')
+    if not os.path.exists(md_path):
+        return {}
+    with open(md_path, 'r', encoding='utf-8') as f:
+        text = f.read()
+    defs = {}
+    sections = re.split(r'####\s+`([^`]+)`', text)
+    for i in range(1, len(sections), 2):
+        code = sections[i].strip()
+        body = sections[i+1].strip()
+        desc = body.split('\n\n')[0].strip().replace('\n', ' ')
+        defs[code] = desc
+    return defs
 
 def build_data():
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -9,46 +54,89 @@ def build_data():
     
     f228_path = os.path.join(dataset_dir, 'full-228-recoded.csv')
     r1137_path = os.path.join(dataset_dir, 'rerun-1137.csv')
+    all_data_path = os.path.join(base_dir, 'AllDataFiltered.Cluster.PPI.8.28.24.csv')
     
+    code_mapping = load_code_mapping(base_dir)
+    code_defs = parse_codebook_definitions(base_dir)
+
+    ai_turn_lookup = {}
+    if os.path.exists(all_data_path):
+        with open(all_data_path, 'r', encoding='utf-8') as f:
+            for row in csv.DictReader(f):
+                x_val = (row.get('X') or '').strip()
+                try:
+                    pid = int(float(x_val))
+                    ai_turn_lookup[pid] = {
+                        1: (row.get('GPTResponse') or '').strip(),
+                        2: (row.get('GPTResponse2') or '').strip(),
+                        3: (row.get('GPTResponse3') or '').strip(),
+                        4: ''
+                    }
+                except Exception:
+                    continue
+
     f228 = list(csv.DictReader(open(f228_path, encoding='utf-8')))
     r1137 = list(csv.DictReader(open(r1137_path, encoding='utf-8')))
-    
-    # 1. Process 228 Human conversations (keep all qualitative code families: SIGNAL, THEME, EVIDENCE, ATTITUDE, etc.)
+
+    def parse_codes(raw_str, is_llm=False):
+        codes = []
+        for raw_c in (raw_str or '').split('|'):
+            raw_c = raw_c.strip()
+            if not raw_c or raw_c in ('Mismatch', 'SIGNAL-Mismatch'):
+                continue
+            mapped = code_mapping.get(raw_c, raw_c)
+            parts = mapped.split('-')
+            if mapped.startswith(('FUTURE-STANCE', 'EMOTIONAL-RESPONSE', 'BELIEF-STATE')):
+                fam = '-'.join(parts[:2])
+                sub = '-'.join(parts[2:])
+            else:
+                fam = parts[0]
+                sub = '-'.join(parts[1:])
+
+            if is_llm and (fam in ('BELIEF-STATE', 'SIGNAL')):
+                continue
+
+            codes.append({
+                'code': mapped,
+                'family': fam,
+                'sub': sub,
+                'definition': code_defs.get(mapped, '')
+            })
+        return codes
+
+    # 1. Process 228 Human conversations
     human_convs = {}
     for r in f228:
         s_num = int(float(r['sample_number']))
         coder = r['coder']
         key = ('human', s_num, coder)
+        p_id = int(float(r['participant_id']))
         if key not in human_convs:
             human_convs[key] = {
                 'sample_number': s_num,
                 'original_sample_number': int(float(r.get('original_sample_number') or s_num)),
                 'source': 'human',
                 'coder': coder,
-                'participant_id': int(float(r['participant_id'])),
+                'participant_id': p_id,
                 'pre_score': float(r['pre_score']),
                 'post_score': float(r['post_score']),
                 'change_score': float(r['change_score']),
                 'turns': []
             }
-        codes = []
-        for c in (r['codes'] or '').split('|'):
-            c = c.strip()
-            if c:
-                fam = c.split('-')[0]
-                sub = c[len(fam)+1:] if '-' in c else ''
-                codes.append({'code': c, 'family': fam, 'sub': sub})
+        t_num = int(float(r['turn_number']))
+        ai_resp = ai_turn_lookup.get(p_id, {}).get(t_num, '')
         human_convs[key]['turns'].append({
-            'turn_number': int(float(r['turn_number'])),
+            'turn_number': t_num,
             'text': r['user_turn_text'],
-            'codes': codes
+            'ai_response': ai_resp,
+            'codes': parse_codes(r['codes'], is_llm=False)
         })
 
     # Sort turns inside human conversations by turn_number
     for cv in human_convs.values():
         cv['turns'].sort(key=lambda t: t['turn_number'])
 
-    # 2. Process 909 LLM conversations (remove SIGNAL family codes per user instructions!)
+    # 2. Process 909 LLM conversations (excludes BELIEF-STATE per specification)
     llm_convs = {}
     for r in r1137:
         if r['source'] == 'llm':
@@ -67,20 +155,13 @@ def build_data():
                     'change_score': float(r['change_score']),
                     'turns': []
                 }
-            codes = []
-            for c in (r['codes'] or '').split('|'):
-                c = c.strip()
-                if c:
-                    fam = c.split('-')[0]
-                    # REMOVE SIGNAL CODES FROM LLM-CODED
-                    if fam == 'SIGNAL':
-                        continue
-                    sub = c[len(fam)+1:] if '-' in c else ''
-                    codes.append({'code': c, 'family': fam, 'sub': sub})
+            t_num = int(float(r['turn_number']))
+            ai_resp = ai_turn_lookup.get(p_id, {}).get(t_num, '')
             llm_convs[key]['turns'].append({
-                'turn_number': int(float(r['turn_number'])),
+                'turn_number': t_num,
                 'text': r['text'],
-                'codes': codes
+                'ai_response': ai_resp,
+                'codes': parse_codes(r['codes'], is_llm=True)
             })
 
     # Sort turns inside LLM conversations by turn_number
@@ -97,28 +178,36 @@ def build_data():
             for c in turn['codes']:
                 code_counts[c['code']] += 1
                 if c['code'] not in code_meta:
-                    code_meta[c['code']] = (c['family'], c['sub'])
+                    code_meta[c['code']] = (c['family'], c['sub'], c.get('definition', ''))
 
     # Group into families
     family_map = defaultdict(list)
-    for code, (fam, sub) in sorted(code_meta.items()):
+    for code, (fam, sub, defn) in sorted(code_meta.items()):
         family_map[fam].append({
             'code': code,
             'sub': sub,
-            'count': code_counts[code]
+            'count': code_counts[code],
+            'definition': defn
         })
 
-    FAMILY_ORDER = ['SIGNAL', 'THEME', 'EVIDENCE', 'ATTITUDE', 'EXTRA', 'FUTURE', 'INVOKE', 'LACK', 'Mismatch']
+    FAMILY_ORDER = [
+        'BELIEF-STATE',
+        'THEME',
+        'EVIDENCE',
+        'CONVERSATION',
+        'ATTITUDE',
+        'FUTURE-STANCE',
+        'EMOTIONAL-RESPONSE',
+        'ENGAGEMENT'
+    ]
     families = []
     for fam in FAMILY_ORDER:
         if fam in family_map:
-            # sort subcodes alphabetically
             subs = sorted(family_map[fam], key=lambda x: x['code'])
             families.append({
                 'family': fam,
                 'subs': subs
             })
-    # Any other families
     for fam in sorted(family_map.keys()):
         if fam not in FAMILY_ORDER:
             families.append({
