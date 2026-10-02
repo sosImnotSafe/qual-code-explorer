@@ -17,7 +17,7 @@ def load_code_mapping(base_dir):
 
     aliases = {
         'EVIDENCE-Eyewitness/Anecdotal': 'EVIDENCE-Eyewitness',
-        'EVIDENCE-Anecdotal': 'EVIDENCE-Personal-Anecdote',
+        'EVIDENCE-Anecdotal': 'EVIDENCE-Eyewitness',
         'EXTRA-Fallacy User': 'CONVERSATION-Logical-Fallacy',
         'FUTURE-IDC (I Don\'t Care)': 'BELIEF-OUTLOOK-Indifference',
         'FUTURE-IDC': 'BELIEF-OUTLOOK-Indifference',

@@ -51,10 +51,6 @@ A **general positive stance** toward science or scientific institutions/methods.
 
 Uses **analogies or comparisons** (often to other events) as evidence.
 
-#### `EVIDENCE-Personal-Anecdote`
-
-Uses **personal or specific stories** (self, friends, family) as evidence.
-
 #### `EVIDENCE-Anomalies`
 
 Use when the speaker treats **inconsistencies, gaps, or things that “don’t make sense”** as evidence for the conspiracy.
@@ -69,7 +65,7 @@ Use **EVIDENCE-Expert-Testimony** when the speaker cites **a specific expert** a
 
 #### `EVIDENCE-Eyewitness`
 
-Claims that someone directly **saw or heard** the relevant event.
+Supergroup for **eyewitness accounts and personal anecdotes**: claims that someone directly **saw or heard** the relevant event, and **personal or specific stories** (self, friends, family) used as evidence.
 
 #### `EVIDENCE-Media-or-Documents`
 

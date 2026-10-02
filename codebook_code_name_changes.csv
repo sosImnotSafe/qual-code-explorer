@@ -9,11 +9,12 @@ ATTITUDE-Politics,ATTITUDE-Politics,no
 ATTITUDE-Science-Negative,ATTITUDE-Science-Negative,no
 ATTITUDE-Science-Positive,ATTITUDE-Science-Positive,no
 EVIDENCE-Analogy,EVIDENCE-Analogy,no
-EVIDENCE-Anecdotal,EVIDENCE-Personal-Anecdote,yes
+EVIDENCE-Anecdotal,EVIDENCE-Eyewitness,yes
 EVIDENCE-Anomalies,EVIDENCE-Anomalies,no
 EVIDENCE-Character Based,EVIDENCE-Character-Credibility,yes
 EVIDENCE-Expert,EVIDENCE-Expert-Testimony,yes
 EVIDENCE-Eyewitness,EVIDENCE-Eyewitness,no
+EVIDENCE-Eyewitness/Anecdotal,EVIDENCE-Eyewitness,yes
 EVIDENCE-Media/Documents,EVIDENCE-Media-or-Documents,yes
 EVIDENCE-Moral Framing,EVIDENCE-Moral-Reasoning,yes
 EVIDENCE-Motive Based,EVIDENCE-Motive,yes
