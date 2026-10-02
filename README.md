@@ -12,11 +12,11 @@ The explorer unifies the complete dataset of **1,137 conversations** (4,548 dial
    - Coded by human annotators: `Coder_A`, `Coder_B`, `Coder_C`.
    - Comprehensive 8-family qualitative publishable codebook:
      - `BELIEF-STATE` (10 codes)
-     - `THEME` (12 codes)
-     - `EVIDENCE` (11 codes)
-     - `CONVERSATION` (7 codes)
+     - `THEME` (13 codes)
+     - `EVIDENCE` (12 codes)
+     - `CONVERSATION` (8 codes)
      - `ATTITUDE` (9 codes)
-     - `BELIEF-OUTLOOK` (4 codes)
+     - `BELIEF-OUTLOOK` (5 codes)
      - `IDENTITY-INVOCATION` (3 codes)
      - `ENGAGEMENT` (2 codes)
 2. **LLM-Coded Corpus (909 conversations / 3,636 turns)**:

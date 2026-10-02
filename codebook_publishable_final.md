@@ -83,6 +83,10 @@ Uses **moral judgments** as part of what counts as proof (good/evil, right/wrong
 
 Use **EVIDENCE-Motive** when the speaker reasons about **whether actors do or do not have a motive**, and uses that as evidence in favor of the conspiracy.
 
+#### `EVIDENCE-Other`
+
+Use **EVIDENCE-Other** when the speaker offers **support that does not fit any other EVIDENCE- code**.
+
 #### `EVIDENCE-Social-Proof`
 
 Uses **what many others believe or do** as evidence.
@@ -125,6 +129,10 @@ The **user** employs a clear logical fallacy as the main argumentative move.
 
 Use **CONVERSATION-Source-Importance** when the user gives **any clue that the *source* of information is itself important to them** — that they are the kind of person who **pays attention to where information comes from**, and this shapes their belief.
 
+#### `CONVERSATION-Other`
+
+Use **CONVERSATION-Other** when the speaker's **conversational move does not fit any other CONVERSATION- code**.
+
 ### BELIEF-OUTLOOK
 
 #### `BELIEF-OUTLOOK-Hedging`
@@ -142,6 +150,10 @@ Future-oriented statements grounded in **moral commitments.**
 #### `BELIEF-OUTLOOK-Openness-to-Change`
 
 Clearly states **willingness to reconsider, learn more, or potentially change** in the future.
+
+#### `BELIEF-OUTLOOK-Other`
+
+Use **BELIEF-OUTLOOK-Other** when the speaker states **an orientation toward future belief or engagement that does not fit any other BELIEF-OUTLOOK- code**.
 
 ### IDENTITY-INVOCATION
 
@@ -246,6 +258,10 @@ Conspiracy centers on **media, entertainment, or information systems** as tools 
 #### `THEME-Money-and-Power`
 
 Use **THEME-Money-and-Power** when financial profit, economic control, or the retention of power is a **central mechanism** of the conspiracy (e.g., going to war for oil/defense contracts, suppressing cures to protect medical profits, paying people off to cover up crimes). Do **NOT** use simply because the actors are wealthy or powerful (e.g., 'the Rothschilds' or 'billionaires')—for that, use THEME-Elite-Privilege or THEME-Secret-Society instead.
+
+#### `THEME-Other`
+
+Use **THEME-Other** when the conspiracy's **theme does not fit any other THEME- code**.
 
 #### `THEME-Science-and-Technology`
 

@@ -36,10 +36,10 @@ def load_code_mapping(base_dir):
         'EMOTIONAL-RESPONSE-General-Identity-or-Principles': 'IDENTITY-INVOCATION-General-Identity-or-Principles',
         'EMOTIONAL-RESPONSE-Morality': 'IDENTITY-INVOCATION-Morality',
         'EMOTIONAL-RESPONSE-Partisanship': 'IDENTITY-INVOCATION-Partisanship',
-        'THEME-Others': 'THEME-Government-Cover-Up',
-        'EXTRA-Others': 'CONVERSATION-Topic-Shift',
-        'FUTURE-Others': 'BELIEF-OUTLOOK-Hedging',
-        'EVIDENCE-Others': 'EVIDENCE-Unspecified-Source'
+        'THEME-Others': 'THEME-Other',
+        'EXTRA-Others': 'CONVERSATION-Other',
+        'FUTURE-Others': 'BELIEF-OUTLOOK-Other',
+        'EVIDENCE-Others': 'EVIDENCE-Other'
     }
     for k, v in aliases.items():
         if k not in mapping:

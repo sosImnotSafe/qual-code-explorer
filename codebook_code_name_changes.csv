@@ -17,6 +17,7 @@ EVIDENCE-Eyewitness,EVIDENCE-Eyewitness,no
 EVIDENCE-Media/Documents,EVIDENCE-Media-or-Documents,yes
 EVIDENCE-Moral Framing,EVIDENCE-Moral-Reasoning,yes
 EVIDENCE-Motive Based,EVIDENCE-Motive,yes
+EVIDENCE-Others,EVIDENCE-Other,yes
 EVIDENCE-Social Proof,EVIDENCE-Social-Proof,yes
 EVIDENCE-Stats / Numbers,EVIDENCE-Statistics-or-Numbers,yes
 EVIDENCE-Unspecified Sources,EVIDENCE-Unspecified-Source,yes
@@ -26,10 +27,12 @@ EXTRA-Ev to Value,CONVERSATION-Shift-to-Values,yes
 EXTRA-Question-Follow-Up,CONVERSATION-Follow-Up-Question,yes
 EXTRA-Question-New,CONVERSATION-New-Question,yes
 EXTRA-Fallacy-User,CONVERSATION-Logical-Fallacy,yes
+EXTRA-Others,CONVERSATION-Other,yes
 FUTURE-Hedging,BELIEF-OUTLOOK-Hedging,yes
 FUTURE-IDC,BELIEF-OUTLOOK-Indifference,yes
 FUTURE-Moral,BELIEF-OUTLOOK-Moral-Commitment,yes
 FUTURE-Open,BELIEF-OUTLOOK-Openness-to-Change,yes
+FUTURE-Others,BELIEF-OUTLOOK-Other,yes
 INVOKE-General,IDENTITY-INVOCATION-General-Identity-or-Principles,yes
 INVOKE-Morality,IDENTITY-INVOCATION-Morality,yes
 INVOKE-Partisanship,IDENTITY-INVOCATION-Partisanship,yes
@@ -55,6 +58,7 @@ THEME-Historical Event,THEME-Historical-Event,yes
 THEME-International Politics,THEME-International-Politics,yes
 THEME-Media,THEME-Media,no
 THEME-Money/Power,THEME-Money-and-Power,yes
+THEME-Others,THEME-Other,yes
 THEME-Science,THEME-Science-and-Technology,yes
 THEME-Secret Society,THEME-Secret-Society,yes
 THEME-Space,THEME-Space-and-UFOs,yes

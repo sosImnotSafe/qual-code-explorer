@@ -146,9 +146,43 @@ def test_filtering_logic(data):
 
     print(f"✓ Filtering logic test passed (Turn-level: {len(turn_matches)} matches, Participant-level: {len(part_matches)} matches, Multi-turn T1+T3: {len(t1_t3_turns)} turns)")
 
+def test_other_codes_stay_other(data):
+    """Catch-all 'Others' codes must stay '<FAMILY>-Other' and must never be relabelled as a substantive code."""
+    import csv
+    family_of_prefix = {'THEME': 'THEME', 'EVIDENCE': 'EVIDENCE', 'ATTITUDE': 'ATTITUDE',
+                        'EXTRA': 'CONVERSATION', 'FUTURE': 'BELIEF-OUTLOOK'}
+    expected_other = {}
+    raw_substantive = {'THEME-Government Cover-up': set(), 'EVIDENCE-Unspecified Sources': set()}
+    with open(os.path.join(BASE_DIR, 'dataset', 'full-228-recoded.csv'), encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            key = (int(float(row['participant_id'])), int(float(row['turn_number'])))
+            for raw in (row['codes'] or '').split('|'):
+                raw = raw.strip()
+                if raw.endswith('-Others'):
+                    expected_other.setdefault(key, set()).add(family_of_prefix[raw.split('-')[0]] + '-Other')
+                if raw in raw_substantive:
+                    raw_substantive[raw].add(key)
+    assert expected_other, "No 'Others' codes found in the raw human data"
+
+    built = {(c['participant_id'], t['turn_number']): {x['code'] for x in t['codes']}
+             for c in data['conversations'] if c['source'] == 'human' for t in c['turns']}
+    for key, codes in expected_other.items():
+        missing = codes - built[key]
+        assert not missing, f"Participant {key[0]} turn {key[1]}: expected {sorted(missing)}, got {sorted(built[key])}"
+
+    # Government Cover Up / Unspecified Source may appear on a turn only if the raw data coded them there.
+    for raw, built_code in (('THEME-Government Cover-up', 'THEME-Government-Cover-Up'),
+                            ('EVIDENCE-Unspecified Sources', 'EVIDENCE-Unspecified-Source')):
+        got = {key for key, codes in built.items() if built_code in codes}
+        assert got == raw_substantive[raw], f"{built_code} turns differ from raw {raw} turns ({len(got)} vs {len(raw_substantive[raw])})"
+
+    print(f"✓ 'Other' codes test passed ({sum(len(v) for v in expected_other.values())} raw 'Others' codes kept as 'Other'; none relabelled)")
+
+
 if __name__ == '__main__':
     data = test_dataset()
     test_html_files()
     test_filtering_logic(data)
+    test_other_codes_stay_other(data)
     print("\nALL VERIFICATION TESTS PASSED SUCCESSFULLY!")
 
