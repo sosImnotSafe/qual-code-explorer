@@ -10,7 +10,7 @@ ATTITUDE-Science-Negative,ATTITUDE-Science-Negative,no
 ATTITUDE-Science-Positive,ATTITUDE-Science-Positive,no
 EVIDENCE-Analogy,EVIDENCE-Analogy,no
 EVIDENCE-Anecdotal,EVIDENCE-Eyewitness,yes
-EVIDENCE-Anomalies,EVIDENCE-Anomalies,no
+EVIDENCE-Anomalies,EVIDENCE-Logical-Inconsistencies,yes
 EVIDENCE-Character Based,EVIDENCE-Character-Credibility,yes
 EVIDENCE-Expert,EVIDENCE-Expert-Testimony,yes
 EVIDENCE-Eyewitness,EVIDENCE-Eyewitness,no
@@ -50,16 +50,16 @@ SIGNAL-Strength-Strong,BELIEF-STATE-High-Strength,yes
 SIGNAL-Strength-Weak,BELIEF-STATE-Low-Strength,yes
 SIGNAL-Turning Point,BELIEF-STATE-Turning-Point,yes
 SIGNAL-Uncertain,BELIEF-STATE-Uncertain,yes
-THEME-Assassination,THEME-Assassination,no
-THEME-Corporation,THEME-Corporate-Power,yes
-THEME-Domestic Politics,THEME-Domestic-Politics,yes
-THEME-Elite,THEME-Elite-Privilege,yes
-THEME-Government Cover-up,THEME-Government-Cover-Up,yes
-THEME-Historical Event,THEME-Historical-Event,yes
-THEME-International Politics,THEME-International-Politics,yes
-THEME-Media,THEME-Media,no
-THEME-Money/Power,THEME-Money-and-Power,yes
-THEME-Others,THEME-Other,yes
-THEME-Science,THEME-Science-and-Technology,yes
-THEME-Secret Society,THEME-Secret-Society,yes
-THEME-Space,THEME-Space-and-UFOs,yes
+THEME-Assassination,BELIEF-THEME-Assassination,yes
+THEME-Corporation,BELIEF-THEME-Corporate-Power,yes
+THEME-Domestic Politics,BELIEF-THEME-Domestic-Politics,yes
+THEME-Elite,BELIEF-THEME-Elite-Privilege,yes
+THEME-Government Cover-up,BELIEF-THEME-Government-Cover-Up,yes
+THEME-Historical Event,BELIEF-THEME-Historical-Event,yes
+THEME-International Politics,BELIEF-THEME-International-Politics,yes
+THEME-Media,BELIEF-THEME-Media,yes
+THEME-Money/Power,BELIEF-THEME-Money-and-Power,yes
+THEME-Others,BELIEF-THEME-Other,yes
+THEME-Science,BELIEF-THEME-Science-and-Technology,yes
+THEME-Secret Society,BELIEF-THEME-Secret-Society,yes
+THEME-Space,BELIEF-THEME-Space-and-UFOs,yes

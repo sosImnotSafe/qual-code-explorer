@@ -70,7 +70,7 @@ def test_dataset():
     human_fams = set(code['family'] for c in data['conversations'] if c['source'] == 'human' for t in c['turns'] for code in t['codes'])
     expected_fams = {
         'BELIEF-STATE',
-        'THEME',
+        'BELIEF-THEME',
         'EVIDENCE',
         'CONVERSATION',
         'ATTITUDE',
@@ -118,20 +118,20 @@ def test_html_files():
 def test_filtering_logic(data):
     convs = data['conversations']
 
-    # Test 1: Turn-level filter: Turn has 'THEME-Domestic-Politics' AND NOT 'EVIDENCE-Anomalies'
+    # Test 1: Turn-level filter: Turn has 'BELIEF-THEME-Domestic-Politics' AND NOT 'EVIDENCE-Logical-Inconsistencies'
     turn_matches = []
     for c in convs:
         for t in c['turns']:
             t_codes = set(item['code'] for item in t['codes'])
-            if 'THEME-Domestic-Politics' in t_codes and 'EVIDENCE-Anomalies' not in t_codes:
+            if 'BELIEF-THEME-Domestic-Politics' in t_codes and 'EVIDENCE-Logical-Inconsistencies' not in t_codes:
                 turn_matches.append((c['participant_id'], t['turn_number']))
     assert len(turn_matches) > 0, "Expected turn-level matches"
 
-    # Test 2: Participant-level filter: Participant has 'THEME-Domestic-Politics' anywhere AND NOT 'THEME-Space-and-UFOs' anywhere
+    # Test 2: Participant-level filter: Participant has 'BELIEF-THEME-Domestic-Politics' anywhere AND NOT 'BELIEF-THEME-Space-and-UFOs' anywhere
     part_matches = []
     for c in convs:
         c_codes = set(item['code'] for t in c['turns'] for item in t['codes'])
-        if 'THEME-Domestic-Politics' in c_codes and 'THEME-Space-and-UFOs' not in c_codes:
+        if 'BELIEF-THEME-Domestic-Politics' in c_codes and 'BELIEF-THEME-Space-and-UFOs' not in c_codes:
             part_matches.append(c['participant_id'])
     assert len(part_matches) > 0, "Expected participant-level matches"
 
@@ -149,7 +149,7 @@ def test_filtering_logic(data):
 def test_other_codes_stay_other(data):
     """Catch-all 'Others' codes must stay '<FAMILY>-Other' and must never be relabelled as a substantive code."""
     import csv
-    family_of_prefix = {'THEME': 'THEME', 'EVIDENCE': 'EVIDENCE', 'ATTITUDE': 'ATTITUDE',
+    family_of_prefix = {'THEME': 'BELIEF-THEME', 'EVIDENCE': 'EVIDENCE', 'ATTITUDE': 'ATTITUDE',
                         'EXTRA': 'CONVERSATION', 'FUTURE': 'BELIEF-OUTLOOK'}
     expected_other = {}
     raw_substantive = {'THEME-Government Cover-up': set(), 'EVIDENCE-Unspecified Sources': set()}
@@ -171,7 +171,7 @@ def test_other_codes_stay_other(data):
         assert not missing, f"Participant {key[0]} turn {key[1]}: expected {sorted(missing)}, got {sorted(built[key])}"
 
     # Government Cover Up / Unspecified Source may appear on a turn only if the raw data coded them there.
-    for raw, built_code in (('THEME-Government Cover-up', 'THEME-Government-Cover-Up'),
+    for raw, built_code in (('THEME-Government Cover-up', 'BELIEF-THEME-Government-Cover-Up'),
                             ('EVIDENCE-Unspecified Sources', 'EVIDENCE-Unspecified-Source')):
         got = {key for key, codes in built.items() if built_code in codes}
         assert got == raw_substantive[raw], f"{built_code} turns differ from raw {raw} turns ({len(got)} vs {len(raw_substantive[raw])})"
@@ -179,10 +179,34 @@ def test_other_codes_stay_other(data):
     print(f"✓ 'Other' codes test passed ({sum(len(v) for v in expected_other.values())} raw 'Others' codes kept as 'Other'; none relabelled)")
 
 
+def test_paper_names(data):
+    """THEME-* is now BELIEF-THEME-* and EVIDENCE-Anomalies is now EVIDENCE-Logical-Inconsistencies, with nothing lost."""
+    import csv
+    all_codes = {c['code'] for cv in data['conversations'] for t in cv['turns'] for c in t['codes']}
+    assert not any(c.startswith('THEME-') for c in all_codes), "Legacy THEME- code ids remain"
+    assert 'EVIDENCE-Anomalies' not in all_codes, "Legacy EVIDENCE-Anomalies remains"
+    fams = {f['family']: f for f in data['families']}
+    assert 'THEME' not in fams and 'BELIEF-THEME' in fams
+    assert len(fams['BELIEF-THEME']['subs']) == 13, f"Expected 13 Belief Theme codes, got {len(fams['BELIEF-THEME']['subs'])}"
+    raw_conv = set()
+    with open(os.path.join(BASE_DIR, 'dataset', 'full-228-recoded.csv'), encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            if 'EVIDENCE-Anomalies' in (row['codes'] or ''):
+                raw_conv.add(int(float(row['participant_id'])))
+    built = {cv['participant_id'] for cv in data['conversations'] if cv['source'] == 'human'
+             for t in cv['turns'] for c in t['codes'] if c['code'] == 'EVIDENCE-Logical-Inconsistencies'}
+    assert built == raw_conv, f"Logical Inconsistencies conversations differ from raw Anomalies ({len(built)} vs {len(raw_conv)})"
+    for filename in ['index.html', 'turn_code_explorer.html']:
+        content = open(os.path.join(BASE_DIR, filename), encoding='utf-8').read()
+        assert "'BELIEF-THEME': 'Belief Theme'" in content and 'legacyCode' in content
+    print(f"\u2713 Paper names test passed (13 Belief Theme codes; Logical Inconsistencies in {len(built)} human conversations, same as raw Anomalies)")
+
+
 if __name__ == '__main__':
     data = test_dataset()
     test_html_files()
     test_filtering_logic(data)
     test_other_codes_stay_other(data)
+    test_paper_names(data)
     print("\nALL VERIFICATION TESTS PASSED SUCCESSFULLY!")
 

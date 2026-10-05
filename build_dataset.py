@@ -4,6 +4,14 @@ import os
 import re
 from collections import defaultdict, Counter
 
+def normalize_renamed(code):
+    """Paper names: THEME-* is now BELIEF-THEME-*, and EVIDENCE-Anomalies is now EVIDENCE-Logical-Inconsistencies."""
+    if code.startswith('THEME-'):
+        code = 'BELIEF-' + code
+    if code == 'EVIDENCE-Anomalies':
+        code = 'EVIDENCE-Logical-Inconsistencies'
+    return code
+
 def load_code_mapping(base_dir):
     mapping_file = os.path.join(base_dir, 'codebook_code_name_changes.csv')
     mapping = {}
@@ -36,7 +44,7 @@ def load_code_mapping(base_dir):
         'EMOTIONAL-RESPONSE-General-Identity-or-Principles': 'IDENTITY-INVOCATION-General-Identity-or-Principles',
         'EMOTIONAL-RESPONSE-Morality': 'IDENTITY-INVOCATION-Morality',
         'EMOTIONAL-RESPONSE-Partisanship': 'IDENTITY-INVOCATION-Partisanship',
-        'THEME-Others': 'THEME-Other',
+        'THEME-Others': 'BELIEF-THEME-Other',
         'EXTRA-Others': 'CONVERSATION-Other',
         'FUTURE-Others': 'BELIEF-OUTLOOK-Other',
         'EVIDENCE-Others': 'EVIDENCE-Other'
@@ -100,9 +108,9 @@ def build_data():
             raw_c = raw_c.strip()
             if not raw_c or raw_c in ('Mismatch', 'SIGNAL-Mismatch'):
                 continue
-            mapped = code_mapping.get(raw_c, raw_c)
+            mapped = normalize_renamed(code_mapping.get(raw_c, raw_c))
             parts = mapped.split('-')
-            if mapped.startswith(('BELIEF-OUTLOOK', 'IDENTITY-INVOCATION', 'FUTURE-STANCE', 'EMOTIONAL-RESPONSE', 'BELIEF-STATE')):
+            if mapped.startswith(('BELIEF-THEME', 'BELIEF-OUTLOOK', 'IDENTITY-INVOCATION', 'FUTURE-STANCE', 'EMOTIONAL-RESPONSE', 'BELIEF-STATE')):
                 fam = '-'.join(parts[:2])
                 sub = '-'.join(parts[2:])
             else:
@@ -224,7 +232,7 @@ def build_data():
 
     FAMILY_ORDER = [
         'BELIEF-STATE',
-        'THEME',
+        'BELIEF-THEME',
         'EVIDENCE',
         'CONVERSATION',
         'ATTITUDE',

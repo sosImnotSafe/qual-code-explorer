@@ -8,6 +8,7 @@ const META = RAW.meta;
 
 const FAMILY_COLOR_VAR = {
   'BELIEF-STATE': '--fam-belief-state',
+  'BELIEF-THEME': '--fam-theme',
   'THEME': '--fam-theme',
   'EVIDENCE': '--fam-evidence',
   'CONVERSATION': '--fam-conversation',
@@ -25,6 +26,13 @@ const FAMILY_COLOR_VAR = {
   'Mismatch': '--fam-mismatch'
 };
 
+// Permalinks made before the paper names (THEME-*, EVIDENCE-Anomalies) still resolve.
+function legacyCode(code){
+  if(code.startsWith('THEME-')) code = 'BELIEF-' + code;
+  if(code === 'EVIDENCE-Anomalies') code = 'EVIDENCE-Logical-Inconsistencies';
+  return code;
+}
+
 function famColor(fam){
   const v = FAMILY_COLOR_VAR[fam] || '--fam-unknown';
   return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
@@ -32,7 +40,8 @@ function famColor(fam){
 function famLabel(fam){
   const labels = {
     'BELIEF-STATE': 'Belief State',
-    'THEME': 'Theme',
+    'BELIEF-THEME': 'Belief Theme',
+    'THEME': 'Belief Theme',
     'EVIDENCE': 'Evidence',
     'CONVERSATION': 'Conversation',
     'ATTITUDE': 'Attitude',
@@ -177,7 +186,7 @@ function parseUrlToState(){
       const entries = g.split('|').map(item=>{
         item = item.trim();
         const negate = item.startsWith('!');
-        const code = negate ? item.slice(1) : item;
+        const code = legacyCode(negate ? item.slice(1) : item);
         return { code, negate };
       }).filter(e=>Boolean(e.code));
       if(entries.length > 0) state.queryGroups.push(entries);

@@ -51,7 +51,7 @@ A **general positive stance** toward science or scientific institutions/methods.
 
 Uses **analogies or comparisons** (often to other events) as evidence.
 
-#### `EVIDENCE-Anomalies`
+#### `EVIDENCE-Logical-Inconsistencies`
 
 Use when the speaker treats **inconsistencies, gaps, or things that “don’t make sense”** as evidence for the conspiracy.
 
@@ -217,56 +217,56 @@ Use **BELIEF-STATE-Turning-Point** for the **first moment in the conversation wh
 
 Expresses **doubt, ambivalence, or mixed feelings** about the belief.
 
-### THEME
+### BELIEF-THEME
 
-#### `THEME-Assassination`
+#### `BELIEF-THEME-Assassination`
 
 Conspiracy is about **targeted killings, attempted killings, or suspicious deaths** of leaders, activists, or public figures.
 
-#### `THEME-Corporate-Power`
+#### `BELIEF-THEME-Corporate-Power`
 
 Conspiracy centers on **companies or business entities** (pharma, tech, oil, banks, etc.) as primary actors planning, profiting, or colluding.
 
-#### `THEME-Domestic-Politics`
+#### `BELIEF-THEME-Domestic-Politics`
 
 About **national-level internal politics**: elections, domestic parties, national politicians, internal policy battles.
 
-#### `THEME-Elite-Privilege`
+#### `BELIEF-THEME-Elite-Privilege`
 
-Use **THEME-Elite-Privilege** when the conspiracy is about **certain powerful people (e.g., the ultra-rich, royalty, celebrities) using their extreme privilege, wealth, or status** to operate above the law, manipulate events, or get **unfair advantages/special treatment** in systems (like courts, government, or media) without facing normal consequences.
+Use **BELIEF-THEME-Elite-Privilege** when the conspiracy is about **certain powerful people (e.g., the ultra-rich, royalty, celebrities) using their extreme privilege, wealth, or status** to operate above the law, manipulate events, or get **unfair advantages/special treatment** in systems (like courts, government, or media) without facing normal consequences.
 
-#### `THEME-Government-Cover-Up`
+#### `BELIEF-THEME-Government-Cover-Up`
 
 Core claim is that **official institutions are suppressing, denying, or manipulating information** to hide mistakes, scandals, crimes, or sensitive operations.
 
-#### `THEME-Historical-Event`
+#### `BELIEF-THEME-Historical-Event`
 
-Use **THEME-Historical-Event** when the conspiracy is about a **specific event that happened at a particular time** (or over a clearly bounded short period).
+Use **BELIEF-THEME-Historical-Event** when the conspiracy is about a **specific event that happened at a particular time** (or over a clearly bounded short period).
 
-#### `THEME-International-Politics`
+#### `BELIEF-THEME-International-Politics`
 
 Focuses on **foreign governments, diplomacy, international organizations, or global agendas** (geopolitics across countries).
 
-#### `THEME-Media`
+#### `BELIEF-THEME-Media`
 
 Conspiracy centers on **media, entertainment, or information systems** as tools of control: propaganda, fake news, coordinated narratives, censorship, or manipulating what people see/hear. This includes faking events via **movie studios/film crews, staged crisis actors, social media bots, or scrubbing content** from the internet.
 
-#### `THEME-Money-and-Power`
+#### `BELIEF-THEME-Money-and-Power`
 
-Use **THEME-Money-and-Power** when financial profit, economic control, or the retention of power is a **central mechanism** of the conspiracy (e.g., going to war for oil/defense contracts, suppressing cures to protect medical profits, paying people off to cover up crimes). Do **NOT** use simply because the actors are wealthy or powerful (e.g., 'the Rothschilds' or 'billionaires')—for that, use THEME-Elite-Privilege or THEME-Secret-Society instead.
+Use **BELIEF-THEME-Money-and-Power** when financial profit, economic control, or the retention of power is a **central mechanism** of the conspiracy (e.g., going to war for oil/defense contracts, suppressing cures to protect medical profits, paying people off to cover up crimes). Do **NOT** use simply because the actors are wealthy or powerful (e.g., 'the Rothschilds' or 'billionaires')—for that, use BELIEF-THEME-Elite-Privilege or BELIEF-THEME-Secret-Society instead.
 
-#### `THEME-Other`
+#### `BELIEF-THEME-Other`
 
-Use **THEME-Other** when the conspiracy's **theme does not fit any other THEME- code**.
+Use **BELIEF-THEME-Other** when the conspiracy's **theme does not fit any other BELIEF-THEME- code**.
 
-#### `THEME-Science-and-Technology`
+#### `BELIEF-THEME-Science-and-Technology`
 
 Centers on **medical, scientific, or technological deception.**
 
-#### `THEME-Secret-Society`
+#### `BELIEF-THEME-Secret-Society`
 
 Focuses on **shadowy or unofficial power structures** like secret societies, hidden cabals, deep state–style networks, or unnamed “they” that operate behind the scenes.
 
-#### `THEME-Space-and-UFOs`
+#### `BELIEF-THEME-Space-and-UFOs`
 
 Involves **aliens, UFOs, secret space programs, or faked space missions**.

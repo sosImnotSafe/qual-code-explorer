@@ -12,7 +12,7 @@ The explorer unifies the complete dataset of **1,137 conversations** (4,548 dial
    - Coded by human annotators: `Coder_A`, `Coder_B`, `Coder_C`.
    - Comprehensive 8-family qualitative publishable codebook:
      - `BELIEF-STATE` (10 codes)
-     - `THEME` (13 codes)
+     - `BELIEF-THEME` (13 codes)
      - `EVIDENCE` (12 codes)
      - `CONVERSATION` (8 codes)
      - `ATTITUDE` (9 codes)
@@ -22,7 +22,7 @@ The explorer unifies the complete dataset of **1,137 conversations** (4,548 dial
 2. **LLM-Coded Corpus (909 conversations / 3,636 turns)**:
    - Coded with `LLM`.
    - Per specification, all `BELIEF-STATE` codes have been removed from the LLM-coded data.
-   - Retains the core dialogue families: `EVIDENCE` and `THEME`.
+   - Retains the core dialogue families: `EVIDENCE` and `BELIEF-THEME`.
 3. **Full Dialogue Context with AI Responses**:
    - Every conversation includes all 4 dialogue turns, complete with the AI assistant's counterarguments (folded by default, expandable on click or globally via topbar toggle).
 4. **Dashboard Header & Cohort Statistics**:
@@ -48,10 +48,12 @@ The app features a bidirectional deep-linking engine. Every filter change update
 | **Coder Filter** | `?coder=Coder_A,Coder_B` |
 | **Score Bounds** | `?pre=60..100&change=20..50` |
 | **Text Search** | `?q=election` |
-| **Having Label X** | `?codes=THEME-Domestic-Politics` |
-| **NOT Having Label Y** | `?codes=!EVIDENCE-Anomalies` |
-| **AND / OR Combinations** | `?codes=(THEME-Domestic-Politics\|THEME-Historical-Event),(!EVIDENCE-Anomalies)` |
+| **Having Label X** | `?codes=BELIEF-THEME-Domestic-Politics` |
+| **NOT Having Label Y** | `?codes=!EVIDENCE-Logical-Inconsistencies` |
+| **AND / OR Combinations** | `?codes=(BELIEF-THEME-Domestic-Politics\|BELIEF-THEME-Historical-Event),(!EVIDENCE-Logical-Inconsistencies)` |
 | **Full Combined Citation** | `?unit=participant&coder=Coder_A&codes=IDENTITY-INVOCATION-General-Identity-or-Principles&pre=50..100` |
+
+> **Naming note.** The code family `THEME` is now `BELIEF-THEME` (shown as "Belief Theme") and `EVIDENCE-Anomalies` is now `EVIDENCE-Logical-Inconsistencies`, matching the paper. Links made with the old ids (for example `?codes=THEME-Domestic-Politics` or `!EVIDENCE-Anomalies`) are translated automatically and still work.
 
 ### Built-in Sharing Tools:
 - **"Share View" Topbar Button**: Copies the current view's permanent URL to the clipboard with one click.
